@@ -9,10 +9,15 @@ local other_callbacks = {
     "onStep",
     "onDraw"
 }
+local serialize_callbacks = {
+	"onSerialize",
+	"onDeserialize",
+}
 
 object_cognant_blacklist = {}
 
-
+local serialize = {}
+local deserialize = {}
 
 -- ========== Enums ==========
 
@@ -60,6 +65,9 @@ Object.new = function(namespace, identifier, parent)
 
     -- Add to Cognition artifact blacklist
     gm.ds_map_set(Global.artifact_cognation_enemy_blacklist, obj, true)
+
+    -- Add to deserialization map for onlne syncing
+    gm.ds_map_set(Global.__mtd_deserialize, obj, gm.constants.__lf_init_multiplayer_globals_customobject_deserialize)
 
     return Object.wrap(obj)
 end
@@ -147,10 +155,18 @@ methods_object = {
             local callback_id = self["on_"..string.lower(string.sub(callback, 3, 3))..string.sub(callback, 4, #callback)]
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
-
-        else log.error("Invalid callback name", 2)
-
+			return
         end
+
+        if callback == "onSerialize" then
+			serialize[self.value] = func
+			return
+		end
+        if callback == "onDeserialize" then
+			deserialize[self.value] = func
+			return
+		end
+		log.error("Invalid callback name", 2)
     end,
 
 
@@ -164,6 +180,9 @@ methods_object = {
         callbacks[self.on_destroy] = nil
         callbacks[self.on_step] = nil
         callbacks[self.on_draw] = nil
+
+        serialize[self.value] = nil
+        deserialize[self.value] = nil
     end,
 
 
@@ -214,7 +233,10 @@ methods_object = {
     onCreate        = function(self, func) self:add_callback("onCreate", func) end,
     onDestroy       = function(self, func) self:add_callback("onDestroy", func) end,
     onStep          = function(self, func) self:add_callback("onStep", func) end,
-    onDraw          = function(self, func) self:add_callback("onDraw", func) end
+    onDraw          = function(self, func) self:add_callback("onDraw", func) end,
+
+    onSerialize     = function(self, func) self:add_callback("onSerialize", func) end,
+    onDeserialize   = function(self, func) self:add_callback("onDeserialize", func) end,
 
 }
 lock_table_object = Proxy.make_lock_table({"value", "RMT_object", table.unpack(Helper.table_get_keys(methods_object))})
@@ -294,6 +316,20 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     end
 end)
 
+
+gm.post_script_hook(gm.constants.__lf_init_multiplayer_globals_customobject_serialize, function(self, other, result, args)
+	local fn = serialize[self.__object_index]
+	if fn then
+		fn(Instance.wrap(self), Message.new(-1, Global.multiplayer_buffer, false))
+	end
+end)
+
+gm.post_script_hook(gm.constants.__lf_init_multiplayer_globals_customobject_deserialize, function(self, other, result, args)
+	local fn = deserialize[self.__object_index]
+	if fn then
+		fn(Instance.wrap(self), Message.new(-1, Global.multiplayer_buffer, true))
+	end
+end)
 
 
 return Object
