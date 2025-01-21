@@ -33,7 +33,7 @@ methods_elite = {
     add_callback = function(self, callback, func)
 
         if callback == "onApply" then 
-            local callback_id = self.on_enter
+            local callback_id = self.on_apply
             if not callbacks[callback_id] then callbacks[callback_id] = {} end
             table.insert(callbacks[callback_id], func)
         else log.error("Invalid callback name", 2) end
@@ -96,7 +96,7 @@ metatable_class["Elite"] = {
 gm.post_script_hook(gm.constants.callback_execute, function(self, other, result, args)
     if callbacks[args[1].value] then
         for _, fn in pairs(callbacks[args[1].value]) do
-            fn(Instance.wrap(args[2].value), args[3].value) --(actor, data)
+            fn(Instance.wrap(args[2].value)) --(actor)
         end
     end
 end)
