@@ -1,3 +1,7 @@
+### v1.2.13
+* Object : Added `onSerialize`/`onDeserialize` for syncing custom objects in netplay.
+* Elite : Fixed errors that made the class unusable.
+
 ### v1.2.12
 * Fixed Cognition artifact incorrectly spawning with custom actors.
 * Object : Added `allow_cognant`.
