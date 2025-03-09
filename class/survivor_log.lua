@@ -48,7 +48,7 @@ Survivor_Log.new = function(survivor, portrait_id, portrait_index)
         abstraction.value,
         stats_base.maxhp, stats_level.maxhp,
         stats_base.damage, stats_level.damage,
-        stats_base.regen * 60, stats_level.regen * 60,
+        stats_base.regen, stats_level.regen,
         stats_base.armor, stats_level.armor
     )
 

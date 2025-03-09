@@ -1,3 +1,6 @@
+### v1.2.15
+* Fixed incorrect health regen values in survivor logs.
+
 ### v1.2.14
 * Updated repo links.
 
