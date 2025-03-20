@@ -346,7 +346,7 @@ gm.post_script_hook(gm.constants.callback_execute, function(self, other, result,
     if callbacks[args[1].value] then
         local player = Instance.wrap(args[2].value)
         for _, fn in ipairs(callbacks[args[1].value]) do
-            fn(player)
+            fn(player, args[3].value) -- actor, embryo
         end
     end
 end)

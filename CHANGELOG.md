@@ -1,3 +1,7 @@
+### v1.2.16
+* Interactable_Object : Fixed error when `clear_callbacks` runs with no `onCheckCost` callbacks registered
+* Equipment : `onUse` now provides `embryo` boolean
+
 ### v1.2.15
 * Fixed incorrect health regen values in survivor logs.
 

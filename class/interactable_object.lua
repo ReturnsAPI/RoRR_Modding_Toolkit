@@ -22,7 +22,9 @@ methods_interactable_object = {
 
     clear_callbacks = function(self)
         self:clear_callbacks_obj_actual()
-        callbacks["onCheckCost"][self.value] = nil
+        if callbacks["onCheckCost"] then
+            callbacks["onCheckCost"][self.value] = nil
+        end
     end,
 
 
