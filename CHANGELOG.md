@@ -1,3 +1,7 @@
+### v1.2.17
+* Buff : Internal optimization for a few common callbacks.
+* Item : Internal optimization for a few common callbacks.
+
 ### v1.2.16
 * Interactable_Object : Fixed error when `clear_callbacks` runs with no `onCheckCost` callbacks registered
 * Equipment : `onUse` now provides `embryo` boolean

@@ -37,6 +37,9 @@ local valid_callbacks = {
 
 local has_custom_item = {}
 local has_callbacks = {}
+local iteration_lookup = {}
+
+
 
 local disabled_loot = {}
 local loot_toggled = {}     -- Loot pools that have been added to this frame
@@ -198,6 +201,17 @@ methods_item = {
             
             self:onAcquire(function(actor, stack)
                 has_custom_item[actor.id] = true
+
+                local _list = iteration_lookup[actor.id]
+                if not _list then
+                    _list = {}
+                    iteration_lookup[actor.id] = _list
+                end
+
+                if not Helper.table_has(_list, self.value) then
+                    table.insert(_list, self.value)
+                end
+
             end)
         end
 
@@ -442,20 +456,23 @@ gm.pre_script_hook(gm.constants.step_actor, function(self, other, result, args)
     if not has_custom_item[self.id] then return end
 
     local actor = Instance.wrap(self)
-    local actorData = actor:get_data("item")
 
     if callbacks["onPreStep"] then
-        for item_id, c_table in pairs(callbacks["onPreStep"]) do
-            local stack = actor:item_stack_count(item_id)
-            if stack > 0 then
-                for _, fn in ipairs(c_table) do
-                    fn(actor, stack)
+        for _, item_id in ipairs(iteration_lookup[actor.id]) do
+            local c_table = callbacks["onPreStep"][item_id]
+            if c_table then
+                local stack = actor:item_stack_count(item_id)
+                if stack > 0 then
+                    for _, fn in ipairs(c_table) do
+                        fn(actor, stack)
+                    end
                 end
             end
         end
     end
 
     if not callbacks["onShieldBreak"] then return end
+    local actorData = actor:get_data("item")
 
     if self.shield and self.shield > 0.0 then actorData.has_shield = true end
     if actorData.has_shield and self.shield <= 0.0 then
@@ -479,11 +496,14 @@ gm.post_script_hook(gm.constants.step_actor, function(self, other, result, args)
 
     local actor = Instance.wrap(self)
 
-    for item_id, c_table in pairs(callbacks["onPostStep"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onPostStep"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
@@ -496,11 +516,14 @@ gm.pre_script_hook(gm.constants.draw_actor, function(self, other, result, args)
 
     local actor = Instance.wrap(self)
 
-    for item_id, c_table in pairs(callbacks["onPreDraw"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onPreDraw"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
@@ -513,11 +536,14 @@ gm.post_script_hook(gm.constants.draw_actor, function(self, other, result, args)
 
     local actor = Instance.wrap(self)
 
-    for item_id, c_table in pairs(callbacks["onPostDraw"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onPostDraw"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
@@ -531,11 +557,14 @@ gm.post_script_hook(gm.constants.recalculate_stats, function(self, other, result
     if not callbacks["onStatRecalc"] then return end
     if not has_custom_item[actor.id] then return end
 
-    for item_id, c_table in pairs(callbacks["onStatRecalc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onStatRecalc"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
@@ -598,11 +627,14 @@ gm.post_script_hook(gm.constants.skill_activate, function(self, other, result, a
     local actor = Instance.wrap(self)
     local active_skill = actor:get_active_skill(args[1].value)
 
-    for item_id, c_table in pairs(callbacks[callback]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack, active_skill)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks[callback][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack, active_skill)
+                end
             end
         end
     end
@@ -670,11 +702,14 @@ function item_onPostStatRecalc(actor)
     if not callbacks["onPostStatRecalc"] then return end
     if not has_custom_item[actor.id] then return end
 
-    for item_id, c_table in pairs(callbacks["onPostStatRecalc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onPostStatRecalc"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, stack)
+                end
             end
         end
     end
@@ -691,11 +726,14 @@ Callback_Raw.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, oth
     actor = Instance.wrap(actor)
 
     if callbacks["onAttackCreate"] then
-        for item_id, c_table in pairs(callbacks["onAttackCreate"]) do
-            local stack = actor:item_stack_count(item_id)
-            if stack > 0 then
-                for _, fn in ipairs(c_table) do
-                    fn(actor, stack, attack_info)
+        for _, item_id in ipairs(iteration_lookup[actor.id]) do
+            local c_table = callbacks["onAttackCreate"][item_id]
+            if c_table then
+                local stack = actor:item_stack_count(item_id)
+                if stack > 0 then
+                    for _, fn in ipairs(c_table) do
+                        fn(actor, stack, attack_info)
+                    end
                 end
             end
         end
@@ -704,11 +742,14 @@ Callback_Raw.add("onAttackCreate", "RMT-Item.onAttackCreate", function(self, oth
     if Helper.is_false(attack_info.proc) then return end
 
     if callbacks["onAttackCreateProc"] then
-        for item_id, c_table in pairs(callbacks["onAttackCreateProc"]) do
-            local stack = actor:item_stack_count(item_id)
-            if stack > 0 then
-                for _, fn in ipairs(c_table) do
-                    fn(actor, stack, attack_info)
+        for _, item_id in ipairs(iteration_lookup[actor.id]) do
+            local c_table = callbacks["onAttackCreateProc"][item_id]
+            if c_table then
+                local stack = actor:item_stack_count(item_id)
+                if stack > 0 then
+                    for _, fn in ipairs(c_table) do
+                        fn(actor, stack, attack_info)
+                    end
                 end
             end
         end
@@ -728,11 +769,14 @@ Callback_Raw.add("onAttackHit", "RMT-Item.onAttackHit", function(self, other, re
     actor = Instance.wrap(actor)
     local victim = Instance.wrap(hit_info.target_true)
 
-    for item_id, c_table in pairs(callbacks["onAttackHit"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, victim, stack, hit_info)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onAttackHit"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, victim, stack, hit_info)
+                end
             end
         end
     end
@@ -783,11 +827,14 @@ Callback_Raw.add("onHitProc", "RMT-Item.onHitProc", function(self, other, result
     local victim = Instance.wrap(args[3].value)
     local hit_info = Hit_Info.wrap(args[4].value)
 
-    for item_id, c_table in pairs(callbacks["onHitProc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, victim, stack, hit_info)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onHitProc"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, victim, stack, hit_info)
+                end
             end
         end
     end
@@ -802,11 +849,14 @@ Callback_Raw.add("onKillProc", "RMT-Item.onKillProc", function(self, other, resu
 
     local victim = Instance.wrap(args[2].value)
 
-    for item_id, c_table in pairs(callbacks["onKillProc"]) do
-        local stack = actor:item_stack_count(item_id)
-        if stack > 0 then
-            for _, fn in ipairs(c_table) do
-                fn(actor, victim, stack)
+    for _, item_id in ipairs(iteration_lookup[actor.id]) do
+        local c_table = callbacks["onKillProc"][item_id]
+        if c_table then
+            local stack = actor:item_stack_count(item_id)
+            if stack > 0 then
+                for _, fn in ipairs(c_table) do
+                    fn(actor, victim, stack)
+                end
             end
         end
     end
@@ -915,6 +965,7 @@ Callback_Raw.add("onStageStart", "RMT-Item.onStageStart", function(self, other, 
     for actor_id, _ in pairs(has_custom_item) do
         if not Instance.exists(actor_id) then
             has_custom_item[actor_id] = nil
+            iteration_lookup[actor_id] = nil
         end
     end
 
