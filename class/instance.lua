@@ -96,7 +96,9 @@ Instance.worm_bodies = Proxy.new({
 
 Instance.exists = function(value)
     value = Wrap.unwrap(value)
-    if type(value) == "string" then return false end
+    local _type = type(value)
+    if _type == "string" then return false end
+    if _type == "userdata" then value = value.id end
     return gm.instance_exists(value) == 1.0
 end
 

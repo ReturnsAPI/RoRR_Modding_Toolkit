@@ -1,3 +1,6 @@
+### v1.2.18
+* Instance : Fixed a crash with `exists` where the CInstance was bad for some reason.
+
 ### v1.2.17
 * Buff : Internal optimization for a few common callbacks.
 * Item : Internal optimization for a few common callbacks.

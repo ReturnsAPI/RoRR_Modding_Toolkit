@@ -1,8 +1,8 @@
 -- RoRR Modding Toolkit
 
 -- ENVY initial setup
-mods["MGReturns-ENVY"].auto()
-envy = mods["MGReturns-ENVY"]
+mods["LuaENVY-ENVY"].auto()
+envy = mods["LuaENVY-ENVY"]
 class_refs = {}
 
 
