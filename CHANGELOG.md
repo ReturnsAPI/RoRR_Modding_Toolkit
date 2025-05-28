@@ -1,3 +1,8 @@
+### v1.2.19
+* Artifact : Fixed `find` not working
+* Monster_Log : Added `set_is_boss`, did bare minimum to make the class usable
+* Implemented a fix for custom drone object upgrading, courtesy of hinyb
+
 ### v1.2.18
 * Instance : Fixed a crash with `exists` where the CInstance was bad for some reason.
 
