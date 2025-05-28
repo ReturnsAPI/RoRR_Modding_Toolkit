@@ -50,6 +50,11 @@ Class:setmetatable({
 
 
 initialize_class = function()
+    -- fix a very cursed vanilla bug where class_artifact gets clobbered with garbage past the vanilla 14 artifacts
+    -- this confuses the class system, eventually breaking the Artifact.find function
+    local class_artifact = gm.variable_global_get("class_artifact")
+    gm.array_resize(class_artifact, gm.variable_global_get("count_artifact"))
+
     for k, v in pairs(class_arrays) do
         class_wrappers[v:sub(7, #v):upper()] = Array.wrap(gm.variable_global_get(v))
         class_find_repopulate(v)
