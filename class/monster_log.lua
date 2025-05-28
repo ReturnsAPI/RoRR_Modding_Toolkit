@@ -19,6 +19,11 @@ Monster_Log.new = function(namespace, identifier)
         )
     )
 
+    monster_log.sprite_id = gm.constants.sLizardWalk
+    monster_log.portrait_id = gm.constants.sPortrait
+
+    monster_log:set_is_boss(false)
+
     return monster_log
 end
 
@@ -92,19 +97,23 @@ methods_monster_log = {
         if type(stats.damage) ~= "number" and type(stats.damage) ~= "nil" then log.error("Damage should be a number, got a "..type(stats.damage), 2) return end
         if type(stats.speed) ~= "number" and type(stats.speed) ~= "nil" then log.error("Speed should be a number, got a "..type(stats.speed), 2) return end
     
-        -- TODO set the variables to stats or to default values
+        self.stat_hp = stats.hp or 100
+        self.stat_damage = stats.damage or 14
+        self.stat_speed = stats.speed or 1.2
     end,
 
     add_kill_track_enemy = function(self, ...)
         local monster_object_ids = {...}
         if type(monster_object_ids[1]) == "table" then monster_object_ids = monster_object_ids[1] end
 
-        local enemy_kills = Array.wrap(self.enemy_object_ids_kills)
+        local enemy_kills = self.enemy_object_ids_kills
         
         for _, monster_object_id in ipairs(monster_object_ids) do
             if type(monster_object_id) ~= "number" then log.error("Monster_object_ids should be number(s), got a "..type(monster_object_id), 2) return end
 
-            enemy_kills:push(monster_object_id)
+            if enemy_kills:size() == 0 or not enemy_kills:contains(monster_object_id) then
+                enemy_kills:push(monster_object_id)
+            end
         end
         
     end,
@@ -113,13 +122,42 @@ methods_monster_log = {
         local monster_object_ids = {...}
         if type(monster_object_ids[1]) == "table" then monster_object_ids = monster_object_ids[1] end
         
-        local enemy_deaths = Array.wrap(self.enemy_object_ids_deaths)
+        local enemy_deaths = self.enemy_object_ids_deaths
 
         for _, monster_object_id in ipairs(monster_object_ids) do
             if type(monster_object_id) ~= "number" then log.error("Monster_object_ids should be number(s), got a "..type(monster_object_id), 2) return end
 
-            enemy_deaths:push(monster_object_id)
+            if enemy_deaths:size() == 0 or not enemy_deaths:contains(monster_object_id) then
+                enemy_deaths:push(monster_object_id)
+            end
         end
+    end,
+
+    set_is_boss = function(self, is_boss)
+        if type(is_boss) ~= "boolean" then log.error("is_boss should be a boolean, got a "..type(is_boss), 2) return end
+
+        if is_boss then
+            self.log_backdrop_index = 1
+        else
+            self.log_backdrop_index = 0
+        end
+
+        -- Remove previous monster log position (if found)
+        local monster_log_order = List.wrap(gm.variable_global_get("monster_log_display_list"))
+        local pos = monster_log_order:find(self)
+        if pos then monster_log_order:delete(pos) end
+
+        local pos = Class.MONSTER_LOG:size()
+        for i, log_id in ipairs(monster_log_order) do
+            local log_ = Class.MONSTER_LOG:get(log_id)
+            local comparison_log = Monster_Log.find(log_:get(0), log_:get(1))
+
+            if comparison_log.log_backdrop_index > self.log_backdrop_index then
+                pos = i
+                break
+            end
+        end
+        monster_log_order:insert(pos - 1, self)
     end,
 }
 
