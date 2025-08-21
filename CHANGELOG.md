@@ -1,3 +1,6 @@
+### v1.2.20
+* Class : Fixed `find_all` ignoring the first element
+
 ### v1.2.19
 * Artifact : Fixed `find` not working
 * Monster_Log : Added `set_is_boss`, did bare minimum to make the class usable
