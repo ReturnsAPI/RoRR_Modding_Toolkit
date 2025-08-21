@@ -1,5 +1,7 @@
 ### v1.2.20
-* Class : Fixed `find_all` ignoring the first element
+* Class 
+  * Fixed `find_all` ignoring the first element
+  * Added filtering to `find_all` , using a string of the property name
 
 ### v1.2.19
 * Artifact : Fixed `find` not working
