@@ -163,10 +163,16 @@ for class, class_array_id in pairs(class_arrays) do
     t.find_all = function(filter, property)
         local _t = {}
 
-        local property = property or 0   -- filter property (default namespace)
+        if property ~= nil then
+            -- find the index of the property
+            property = hardcoded.enum[string.upper(class_array_id_og)][string.lower(property)] - 1
+        else
+            property = 0   -- filter property (default namespace)
+        end
 
         local arr = gm.variable_global_get(class_array_id_og)
         local find_table = class_find_table[class_array_id_og]
+
         for id = 0, #find_table do
             if find_table[id] ~= "invalid" then
                 local element = gm.array_get(arr, id)
