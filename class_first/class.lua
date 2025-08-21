@@ -176,7 +176,7 @@ for class, class_array_id in pairs(class_arrays) do
         for id = 0, #find_table do
             if find_table[id] ~= "invalid" then
                 local element = gm.array_get(arr, id)
-                if (not filter)
+                if (filter == nil)
                 or gm.array_get(element, property) == filter then
                     table.insert(_t, t.wrap(id))
                 end
