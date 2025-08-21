@@ -167,12 +167,12 @@ for class, class_array_id in pairs(class_arrays) do
 
         local arr = gm.variable_global_get(class_array_id_og)
         local find_table = class_find_table[class_array_id_og]
-        for id, nsid in ipairs(find_table) do
-            if nsid ~= "invalid" then
-                local element = gm.array_get(arr, id - 1)
+        for id = 0, #find_table do
+            if find_table[id] ~= "invalid" then
+                local element = gm.array_get(arr, id)
                 if (not filter)
                 or gm.array_get(element, property) == filter then
-                    table.insert(_t, t.wrap(id - 1))
+                    table.insert(_t, t.wrap(id))
                 end
             end
         end
