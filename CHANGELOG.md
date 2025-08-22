@@ -1,3 +1,6 @@
+### v1.2.21
+* Fixed bug created from previous update
+
 ### v1.2.20
 * Class 
   * Fixed `find_all` ignoring the first element
