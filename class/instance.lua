@@ -107,7 +107,7 @@ Instance.is = function(value)
     value = Wrap.unwrap(value)
     return gm.typeof(value) == "struct"
        and gm.instance_exists(value) == 1.0
-       and gm.object_exists(value) == 0.0
+       and gm.object_exists(value) == false
 end
 
 

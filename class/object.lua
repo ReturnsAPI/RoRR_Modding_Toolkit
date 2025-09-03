@@ -51,7 +51,7 @@ Object.PARENT = Proxy.new({
 }):lock()
 
 
-Object.CUSTOM_START = 800
+Object.CUSTOM_START = 900
 
 
 
@@ -105,16 +105,19 @@ Object.wrap = function(value)
 
     local mt = metatable_object
     local lt = lock_table_object
-
-    if gm.object_is_ancestor(value, gm.constants.pInteractable) == 1.0
-    or gm.object_is_ancestor(value, gm.constants.pInteractableChest) == 1.0
-    or gm.object_is_ancestor(value, gm.constants.pInteractableCrate) == 1.0
-    or gm.object_is_ancestor(value, gm.constants.pInteractableDrone) == 1.0 then
-        mt = metatable_interactable_object
-        lt = lock_table_interactable_object
-    end
     
-    if value >= Object.CUSTOM_START then
+    -- Vanilla objects
+    if value < Object.CUSTOM_START then
+        if gm.object_is_ancestor(value, gm.constants.pInteractable) == 1.0
+        or gm.object_is_ancestor(value, gm.constants.pInteractableChest) == 1.0
+        or gm.object_is_ancestor(value, gm.constants.pInteractableCrate) == 1.0
+        or gm.object_is_ancestor(value, gm.constants.pInteractableDrone) == 1.0 then
+            mt = metatable_interactable_object
+            lt = lock_table_interactable_object
+        end
+
+    -- Custom objects
+    else
         local custom_object = Array.wrap(gm.variable_global_get("custom_object"))
         local obj_array = custom_object:get(value - Object.CUSTOM_START)
         local obj_index = obj_array:get(0)
@@ -126,6 +129,7 @@ Object.wrap = function(value)
             mt = metatable_interactable_object
             lt = lock_table_interactable_object
         end
+
     end
 
     return make_wrapper(value, mt, lt)
