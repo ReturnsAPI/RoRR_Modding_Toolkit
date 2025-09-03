@@ -1,3 +1,8 @@
+### v1.2.22
+* Fixes relating to the new 1.1.0 RoRR Release
+    * Object : Change CUSTOM_START to 900
+    * Wrap : fixed an issue where a number became a boolean
+
 ### v1.2.21
 * Fixed bug created from previous update
 
