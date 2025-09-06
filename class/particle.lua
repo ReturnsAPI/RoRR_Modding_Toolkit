@@ -58,20 +58,24 @@ Particle.find = function(namespace, identifier)
     end
 
     local lookup = gm.variable_global_get("ResourceManager_particleTypes").__namespacedAssetLookup
-    if not lookup[namespace] then return nil end
-    if not lookup[namespace][identifier] then return nil end
-    return Particle.wrap(lookup[namespace][identifier])
+    local np = gm.ds_map_find_value(lookup, namespace)
+    if not np then return nil end
+    local id = gm.ds_map_find_value(np, identifier)
+    if not id then return nil end
+    return Particle.wrap(id)
 end
 
 
 Particle.find_all = function(namespace)
     local lookup = gm.variable_global_get("ResourceManager_particleTypes").__namespacedAssetLookup
-    if not lookup[namespace] then return {}, 0 end
+    local np = gm.ds_map_find_value(lookup, namespace)
+    if not np then return {}, 0 end
 
     local parts = {}
-    local names = GM.variable_struct_get_names(lookup[namespace])
-    for _, name in ipairs(names) do
-        table.insert(parts, Particle.wrap(lookup[namespace][name]))
+    local values = gm.ds_map_values_to_array(np)
+    local size = gm.ds_map_size(np)
+    for i=0, size do
+        table.insert(parts,Particle.wrap(values[i]))
     end
     return parts, #parts > 0
 end

@@ -1,3 +1,7 @@
+### v1.2.23
+* Particle
+    * Fixed `find` and `find_all`, now using ds maps
+
 ### v1.2.22
 * Fixes relating to the new 1.1.0 RoRR Release
     * Object : Change CUSTOM_START to 900
