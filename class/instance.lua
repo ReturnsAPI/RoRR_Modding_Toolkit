@@ -119,7 +119,7 @@ Instance.find = function(...)
         obj = Wrap.unwrap(obj)
 
         local inst = gm.instance_find(obj, 0)
-        if obj >= 800.0 then
+        if obj >= 900.0 then
             local customs = {
                 gm.constants.oCustomObject,
                 gm.constants.oCustomObject_pPickupItem,
@@ -170,7 +170,7 @@ Instance.find_all = function(...)
     for _, obj in ipairs(t) do
         obj = Wrap.unwrap(obj)
 
-        if obj < 800.0 then
+        if obj < 900.0 then
             local count = Instance.count(obj)
             for n = 0, count - 1 do
                 local inst = gm.instance_find(obj, n)

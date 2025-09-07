@@ -1,3 +1,8 @@
+### v1.2.24
+* Instance
+    * Updated the custom object checks from 800 to 900, in accordance with the new custom object start
+    * This fixes issues with `find` and `find_all`
+
 ### v1.2.23
 * Particle
     * Fixed `find` and `find_all`, now using ds maps
